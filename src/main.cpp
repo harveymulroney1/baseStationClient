@@ -160,6 +160,18 @@ String httpGETRequest(const char* serverName) {
 
   return payload;
 }
+std::vector<String> split(String s, char delimiter) {
+  std::vector<String> tokens;
+  int start = 0;
+  int end = s.indexOf(delimiter);
+  while (end != -1) {
+    tokens.push_back(s.substring(start, end));
+    start = end + 1;
+    end = s.indexOf(delimiter, start);
+  }
+  tokens.push_back(s.substring(start));
+  return tokens;
+}
 void handleClimateData()
 {
   addCORS();
@@ -171,7 +183,7 @@ void handleClimateData()
 String pollSensors(){
   WiFiClient client;
   HTTPClient http;
-    
+  String payload = ""; 
   //your Domain name with URL path or IP address with path
   for(int i=0;i<3;i++)
   {
@@ -180,14 +192,21 @@ String pollSensors(){
     http.begin(client,sensorClimate);
     //send HTTP POST request
     int httpResponseCode = http.GET();
-    String payload = "--"; 
+    
 
     if(httpResponseCode==200){
-      payload = http.getString();
-      zoneData[i].lastUpdated=millis();
-      zoneData[i].active=true;
-      Serial.println("Response:"+payload);
-    }
+      String response = http.getString();
+      auto parts = split(response,',');
+      if (parts.size() >= 4) 
+      {
+        zoneData[i].temp = parts[1];
+        zoneData[i].noise = parts[2];
+        zoneData[i].light = parts[3];
+        zoneData[i].lastUpdated = millis();
+        zoneData[i].active = true;
+        Serial.println("Response:"+response);
+        payload+= response + "\n";
+      }
     else if(sensors[i].retries==0){
       // retry mechanism
       zoneData[i].active=false;
@@ -199,6 +218,7 @@ String pollSensors(){
     }
     //free resources
     http.end();
-    return payload;
+    
   }
+  return payload;
 }
