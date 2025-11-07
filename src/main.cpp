@@ -32,6 +32,7 @@ struct ZoneData{
   String temp;
   String noise;
   String light;
+  String time;
   unsigned long lastUpdated;
   bool active;
 };
@@ -247,11 +248,12 @@ String pollSensors(){
     if(httpResponseCode==200){
       String response = http.getString();
       auto parts = split(response,',');
-      if (parts.size() >= 4) 
+      if (parts.size() >= 5) 
       {
         zoneData[i].temp = parts[1];
         zoneData[i].noise = parts[2];
         zoneData[i].light = parts[3];
+        zoneData[i].time = parts[4];
         zoneData[i].lastUpdated = millis();
         zoneData[i].active = true;
         Serial.println("Response:"+response);
