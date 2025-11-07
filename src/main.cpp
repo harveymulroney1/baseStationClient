@@ -73,6 +73,11 @@ void setup() {
   connectToWifi();
 
   server.on("/getClimateData",handleClimateData);
+  server.on("/getBattery/1",[=](){fetchBatteryPercentage(1);});
+  server.on("/getBattery/2",[=](){fetchBatteryPercentage(2);});
+  server.on("/getBattery/3",[=](){fetchBatteryPercentage(3);});
+  server.on("/sanityCheck",sanityCheck);
+  server.on("/fetchSavedData",fetchSavedData);
   server.begin(); // start server.
   Serial.println("HTTP Server Started");
 }
@@ -143,6 +148,42 @@ void fetchSavedData()
     Serial.println("Received from sensor "+sensors->name+":\n" + response);
     //STORE TO DB here ******
   }
+}
+void sanityCheck(){
+    addCORS();
+  int count = 0;
+  for(int i=0;i<3;i++)
+  {
+    String endpoint = "http://"+String(sensors[i].ip)+"/sanityCheck";
+    String response = httpGETRequest(endpoint.c_str());
+    if(response = "Data OK")
+    {
+      count++;
+    }
+  }
+  if(count==3)
+  {
+    server.send(200,"text/plain","Data OK - ALL VALID");
+    
+  }
+  else{
+    server.send(4040,"text/plain","NOT ALL VALID - Error Occured");
+  }
+}
+void fetchBatteryPercentage(int device){
+  addCORS();
+  String host = "";
+  if(device>0 && device <=3){
+    host = sensors[device-1].ip;
+    // boundary
+  }
+  else{
+    return;
+  }
+  String endpoint = "http://"+host+"/getBattery";
+  String response = httpGETRequest(endpoint.c_str());
+  server.send(200,"text/plain",response);
+  
 }
 String httpGETRequest(const char* serverName) {
   WiFiClient client;
@@ -230,4 +271,5 @@ String pollSensors(){
     
   }
   return payload;
+}
 }
