@@ -134,7 +134,16 @@ void loop() {
     }
   }
 }
-
+void fetchSavedData()
+{
+  for(int i=0;i<3;i++)
+  {
+    String endpoint = "http://"+String(sensors[i].ip)+"/getSavedReadings";
+    String response = httpGETRequest(endpoint.c_str());
+    Serial.println("Received from sensor "+sensors->name+":\n" + response);
+    //STORE TO DB here ******
+  }
+}
 String httpGETRequest(const char* serverName) {
   WiFiClient client;
   HTTPClient http;
