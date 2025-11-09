@@ -62,6 +62,9 @@ void connectToWifi();
 String pollSensors();
 void sendCORSHeaders();
 void handleClimateData();
+void sanityCheck();
+void fetchBatteryPercentage(int device);
+void fetchSavedData();
 void addCORS();
 void addCORS() {
   server.sendHeader("Access-Control-Allow-Origin", "*");
@@ -114,22 +117,22 @@ void loop() {
   if(currentMillis - previousMillis >= interval) {
      // Check WiFi connection status
     if(WiFi.status()== WL_CONNECTED ){ 
-      pollSensors();
-      httpGETRequest(lightsRed); 
-      delay(1000);   
-      httpGETRequest(lightsGreen);
-      delay(1000);
+      //pollSensors();
+      //httpGETRequest(lightsRed); 
+      //delay(1000);   
+      //httpGETRequest(lightsGreen);
+      //delay(1000);
       httpGETRequest(lightsBlue);
       delay(500);
       httpGETRequest(lightsBlueOff);
       Serial.println("Lights switching on");
-      delay(1000);
+      //delay(1000);
 
       Serial.println("Fetching climate data from server...");
       
-      temperature = httpGETRequest(serverNameTemp);
-      humidity = httpGETRequest(serverNameHumi);
-      pressure = httpGETRequest(serverNamePres);
+      //temperature = httpGETRequest(serverNameTemp);
+      //humidity = httpGETRequest(serverNameHumi);
+      //pressure = httpGETRequest(serverNamePres);
       Serial.println("Temperature: " + temperature + "'C - Humidity: " + humidity + "% - Pressure: " + pressure + " hPa");
       
       //save the last HTTP GET request
@@ -173,6 +176,7 @@ void sanityCheck(){
 }
 void fetchBatteryPercentage(int device){
   addCORS();
+  Serial.println("Getting battery");
   String host = "";
   if(device>0 && device <=3){
     host = sensors[device-1].ip;
@@ -181,8 +185,11 @@ void fetchBatteryPercentage(int device){
   else{
     return;
   }
+    Serial.println("Getting battery from: "+host);
+
   String endpoint = "http://"+host+"/getBattery";
   String response = httpGETRequest(endpoint.c_str());
+  Serial.println("Battery:"+response);
   server.send(200,"text/plain",response);
   
 }
@@ -272,6 +279,6 @@ String pollSensors(){
     http.end();
     
   }
-  return payload;
 }
+  return payload;
 }
