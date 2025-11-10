@@ -11,7 +11,7 @@
 #include <HTTPClient.h>
 #include <WebServer.h>
 
-#define REMOTE_IP "10.45.1.14"
+#define REMOTE_IP "192.168.137.202"
 IPAddress SERVER_IP (192,168,137,201);
 IPAddress gateway(192, 168, 137, 1);
 IPAddress subnet(255, 255, 255, 0); 
@@ -155,9 +155,9 @@ void loop() {
 
       Serial.println("Fetching climate data from server...");
       
-      //temperature = httpGETRequest(serverNameTemp);
-      //humidity = httpGETRequest(serverNameHumi);
-      //pressure = httpGETRequest(serverNamePres);
+      temperature = httpGETRequest(serverNameTemp);
+      humidity = httpGETRequest(serverNameHumi);
+      pressure = httpGETRequest(serverNamePres);
       Serial.println("Temperature: " + temperature + "'C - Humidity: " + humidity + "% - Pressure: " + pressure + " hPa");
       
       //save the last HTTP GET request
