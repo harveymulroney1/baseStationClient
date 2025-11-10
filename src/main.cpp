@@ -11,12 +11,13 @@
 #include <HTTPClient.h>
 #include <WebServer.h>
 
-#define REMOTE_IP "10.45.1.14"
-IPAddress SERVER_IP (10,45,1,13);
-IPAddress gateway(10, 45, 1, 1);
+#define REMOTE_IP "192.168.137.6"
+//IPAddress SERVER_IP (10,45,1,13);
+IPAddress SERVER_IP (192,168,137,5);
+IPAddress gateway(192,168, 137, 1);
 IPAddress subnet(255, 255, 255, 0); 
-const char* ssid = "GowersSmall";
-const char* password = "mattyisalegend";
+const char* ssid = "BaseStation";
+const char* password = "123123123";
 WebServer server(80);
 struct Sensor{
   String name;
@@ -24,9 +25,9 @@ struct Sensor{
   int retries = 3;
 };
 Sensor sensors[]={
-  {"Zone 1","10.45.1.14"},
-  {"Zone 2","10.45.1.15"},
-  {"Zone 3","10.45.1.16"}
+  {"Zone 1","192.168.137.6"},
+  {"Zone 2","192.168.137.7"},
+  {"Zone 3","192.168.137.8"}
 };
 struct ZoneData{
   String temp;
