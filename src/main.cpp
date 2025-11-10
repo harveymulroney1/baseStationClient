@@ -12,11 +12,11 @@
 #include <WebServer.h>
 
 #define REMOTE_IP "10.45.1.14"
-IPAddress SERVER_IP (10,45,1,13);
-IPAddress gateway(10, 45, 1, 1);
+IPAddress SERVER_IP (192,168,137,201);
+IPAddress gateway(192, 168, 137, 1);
 IPAddress subnet(255, 255, 255, 0); 
-const char* ssid = "GowersSmall";
-const char* password = "mattyisalegend";
+const char* ssid = "BaseStation";
+const char* password = "123123123";
 WebServer server(80);
 struct Sensor{
   String name;
@@ -24,7 +24,7 @@ struct Sensor{
   int retries = 3;
 };
 Sensor sensors[]={
-  {"Zone 1","10.45.1.14"},
+  {"Zone 1","192.168.137.202"},
   {"Zone 2","10.45.1.15"},
   {"Zone 3","10.45.1.16"}
 };
@@ -48,6 +48,11 @@ const char* lightsGreen = "http://"REMOTE_IP"/greenON";
 const char* lightsGreenOff = "http://"REMOTE_IP"/greenOFF";
 const char* lightsBlue = "http://"REMOTE_IP"/blueON";
 const char* lightsBlueOff = "http://"REMOTE_IP"/blueOFF";
+//const char* getLowPower = "http://"REMOTE_IP"/getLowPower";
+//const char* lowPowerModeOn = "http://"REMOTE_IP"/lowPowerModeOn";
+//const char* lowPowerModeOff = "http://"REMOTE_IP"/lowPowerModeOff";
+//const char* autoLowPowerModeOn = "http://"REMOTE_IP"/autoLowPowerModeOn";
+//const char* autoLowPowerModeOff = "http://"REMOTE_IP"/autoLowPowerModeOff";
 
 String temperature;
 String humidity;
@@ -64,6 +69,11 @@ void sendCORSHeaders();
 void handleClimateData();
 void sanityCheck();
 void fetchBatteryPercentage(int device);
+void getLowPower(int device);
+void lowPowerModeOn(int device);
+void lowPowerModeOff(int device);
+void autoLowPowerModeOn(int device);
+void autoLowPowerModeOff(int device);
 void fetchSavedData();
 void addCORS();
 void addCORS() {
@@ -80,6 +90,21 @@ void setup() {
   server.on("/getBattery/1",[=](){fetchBatteryPercentage(1);});
   server.on("/getBattery/2",[=](){fetchBatteryPercentage(2);});
   server.on("/getBattery/3",[=](){fetchBatteryPercentage(3);});
+  server.on("/getLowPower/1",[=](){getLowPower(1);});
+  server.on("/getLowPower/2",[=](){getLowPower(2);});
+  server.on("/getLowPower/3",[=](){getLowPower(3);});
+  server.on("/lowPowerModeOn/1",[=](){lowPowerModeOn(1);});
+  server.on("/lowPowerModeOn/2",[=](){lowPowerModeOn(2);});
+  server.on("/lowPowerModeOn/3",[=](){lowPowerModeOn(3);});
+  server.on("/lowPowerModeOff/1",[=](){lowPowerModeOff(1);});
+  server.on("/lowPowerModeOff/2",[=](){lowPowerModeOff(2);});
+  server.on("/lowPowerModeOff/3",[=](){lowPowerModeOff(3);});
+  server.on("/autoLowPowerModeOn/1",[=](){autoLowPowerModeOn(1);});
+  server.on("/autoLowPowerModeOn/2",[=](){autoLowPowerModeOn(2);});
+  server.on("/autoLowPowerModeOn/3",[=](){autoLowPowerModeOn(3);});
+  server.on("/autoLowPowerModeOff/1",[=](){autoLowPowerModeOff(1);});
+  server.on("/autoLowPowerModeOff/2",[=](){autoLowPowerModeOff(2);});
+  server.on("/autoLowPowerModeOff/3",[=](){autoLowPowerModeOff(3);});
   server.on("/sanityCheck",sanityCheck);
   server.on("/fetchSavedData",fetchSavedData);
   server.begin(); // start server.
@@ -193,6 +218,108 @@ void fetchBatteryPercentage(int device){
   server.send(200,"text/plain",response);
   
 }
+
+void getLowPower(int device){
+  addCORS();
+  Serial.println("Getting low power");
+  String host = "";
+  if(device>0 && device <=3){
+    host = sensors[device-1].ip;
+    // boundary
+  }
+  else{
+    return;
+  }
+    Serial.println("Getting battery from: "+host);
+
+  String endpoint = "http://"+host+"/getLowPower";
+  String response = httpGETRequest(endpoint.c_str());
+  Serial.println("Low power mode: "+response);
+  server.send(200,"text/plain",response);
+  
+}
+
+
+void lowPowerModeOn(int device){
+  addCORS();
+  Serial.println("Activating low power mode for device " + device);
+  String host = "";
+  if(device>0 && device <=3){
+    host = sensors[device-1].ip;
+    // boundary
+  }
+  else{
+    return;
+  }
+    Serial.println("Low power mode enabling for: "+host);
+
+  String endpoint = "http://"+host+"/lowPowerModeOn";
+  String response = httpGETRequest(endpoint.c_str());
+  Serial.println("Low power mode on response : "+response);
+  server.send(200,"text/plain",response);
+  
+}
+
+void lowPowerModeOff(int device){
+  addCORS();
+  Serial.println("Deactivating low power mode for device " + device);
+  String host = "";
+  if(device>0 && device <=3){
+    host = sensors[device-1].ip;
+    // boundary
+  }
+  else{
+    return;
+  }
+    Serial.println("Low power mode disabling for: "+host);
+
+  String endpoint = "http://"+host+"/lowPowerModeOff";
+  String response = httpGETRequest(endpoint.c_str());
+  Serial.println("Low power mode off response : "+response);
+  server.send(200,"text/plain",response);
+  
+}
+
+void autoLowPowerModeOn(int device){
+  addCORS();
+  Serial.println("Enabling automatic low power mode for device " + device);
+  String host = "";
+  if(device>0 && device <=3){
+    host = sensors[device-1].ip;
+    // boundary
+  }
+  else{
+    return;
+  }
+    Serial.println("Enabling automatic low power mode for: "+host);
+
+  String endpoint = "http://"+host+"/autoLowPowerModeOn";
+  String response = httpGETRequest(endpoint.c_str());
+  Serial.println("Automatic low power mode on response : "+response);
+  server.send(200,"text/plain",response);
+  
+}
+
+void autoLowPowerModeOff(int device){
+  addCORS();
+  Serial.println("Disabling automatic low power mode for device " + device);
+  String host = "";
+  if(device>0 && device <=3){
+    host = sensors[device-1].ip;
+    // boundary
+  }
+  else{
+    return;
+  }
+    Serial.println("Disabling automatic low power mode for: "+host);
+
+  String endpoint = "http://"+host+"/autoLowPowerModeOff";
+  String response = httpGETRequest(endpoint.c_str());
+  Serial.println("Automatic low power mode off response : "+response);
+  server.send(200,"text/plain",response);
+}
+
+
 String httpGETRequest(const char* serverName) {
   WiFiClient client;
   HTTPClient http;
